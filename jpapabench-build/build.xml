@@ -163,8 +163,6 @@
 
     <target name="run.jpapabench.pj" depends="build.jpapabench.pj" description="- run a plain Java version of jPapaBench">
 		<java classname="papabench.pj.PapaBenchPlainJavaApplication" fork="true" output="${log.dir}/jpapabench_pj.out" error="${log.dir}/jpapabench_pj.err">
-			<jvmarg value="-Xmx20g" />
-			<jvmarg value="-Xss64m" />
 			<classpath refid="classpath.run.jpapabench.pj" />
 		</java>
 	</target>
