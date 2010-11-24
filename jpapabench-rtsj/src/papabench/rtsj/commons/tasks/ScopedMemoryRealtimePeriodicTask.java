@@ -50,9 +50,10 @@ public class ScopedMemoryRealtimePeriodicTask extends RealtimePeriodicTask {
 	
 	@Override
 	public void run() {
-		// allocate scope - FIXME the sizes
-		ScopedMemory scopedMemory = new LTMemory(2000,16000000);
+		// allocate scope - FIXME the sizes should be passed by ctor
+		ScopedMemory scopedMemory = new LTMemory(1024,2048);
 		
+		// FIXME handle the missed periods
 		while (true) {			
 			do {				
 				scopedMemory.enter(targetRunnable);
