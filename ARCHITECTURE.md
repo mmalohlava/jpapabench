@@ -17,6 +17,43 @@ PapaBench is designed as a real-time embedded benchmark that demonstrates:
 
 The system follows a modular architecture with three main subsystems:
 
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         JPapaBench System                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌────────────────────────┐         ┌──────────────────────┐  │
+│  │  Autopilot Module      │◄───SPI──►│  FBW Module          │  │
+│  │  (MCU0 - Master)       │  Bus    │  (MCU1 - Slave)      │  │
+│  ├────────────────────────┤         ├──────────────────────┤  │
+│  │ • Estimator            │         │ • Servo Control      │  │
+│  │ • Navigator            │         │ • Radio Receiver     │  │
+│  │ • Flight Plan          │         │ • Failsafe Logic     │  │
+│  │ • Control PIDs         │         │ • Link to Autopilot  │  │
+│  │ • Link to FBW          │         │                      │  │
+│  └────────────────────────┘         └──────────────────────┘  │
+│           ▲                                    │               │
+│           │                                    ▼               │
+│     ┌─────┴──────┐                    ┌──────────────┐        │
+│     │  Sensors   │                    │   Servos     │        │
+│     ├────────────┤                    ├──────────────┤        │
+│     │ • GPS      │                    │ • Elevator   │        │
+│     │ • IR       │                    │ • Aileron    │        │
+│     │ • Pressure │                    │ • Rudder     │        │
+│     └────────────┘                    │ • Motors     │        │
+│                                        └──────────────┘        │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │              Simulator Module (Optional)                 │  │
+│  ├──────────────────────────────────────────────────────────┤  │
+│  │ • Flight Model (Physics)                                 │  │
+│  │ • GPS Simulator                                          │  │
+│  │ • IR Simulator                                           │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
 ### 1. **Autopilot Module** (MCU0)
 The autopilot is responsible for high-level flight control and navigation:
 
@@ -97,6 +134,39 @@ The system uses periodic tasks with specific execution rates:
 4. Autopilot → FBW (control commands via SPI)
 5. FBW → Servos (actuation commands)
 6. FBW → Autopilot (status feedback via SPI)
+
+```
+   ┌─────────┐
+   │ Sensors │
+   └────┬────┘
+        │ (GPS, IR, Pressure)
+        ▼
+   ┌────────────┐       ┌──────────────┐
+   │ Estimator  │──────►│  Navigator   │
+   │ (Position, │       │ (Flight Plan │
+   │  Attitude) │       │  Execution)  │
+   └────────────┘       └──────┬───────┘
+                               │
+                               ▼
+                        ┌──────────────┐
+                        │  PIDs        │
+                        │ (Control     │
+                        │  Outputs)    │
+                        └──────┬───────┘
+                               │
+                               ▼ (via SPI Bus)
+                        ┌──────────────┐
+                        │  FBW Module  │
+                        │ (Servo       │
+                        │  Commands)   │
+                        └──────┬───────┘
+                               │
+                               ▼
+                        ┌──────────────┐
+                        │   Servos     │
+                        │ (Actuation)  │
+                        └──────────────┘
+```
 
 ## Flight Plan Architecture
 
